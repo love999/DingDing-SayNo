@@ -60,6 +60,10 @@ startProgram();
  */
 function startProgram() {
     unlockIfNeed();
+
+  	device.setBrightnessMode(0)
+  	device.setBrightness(0)
+
     sleep(waitTime * 1000);
     // 1.检查权限
     checkMyPermission();
@@ -356,7 +360,7 @@ function getReslt() {
     toastLog("识别打卡结果");
 
     try {
-        if (textContains("打卡成功").exists() || descContains("打卡成功").exists()) {
+        if (textContains("已打卡").exists() || descContains("已打卡").exists()) {
             setLog("普通识别结果：" + myStr + "成功!");
         } else {
             setLog("普通识别结果：" + myStr + "失败!，扣你丫工资~");
@@ -398,12 +402,8 @@ function getContentByOcr() {
 function punchTheClock() {
     setLog("当前操作：" + myStr);
     waitBtnShow();
-    if (text(myStr).clickable(true).exists()) {
-        text(myStr).clickable(true).findOne().click();
-    }
-    if (desc(myStr).clickable(true).exists()) {
-        desc(myStr).clickable(true).findOne().click();
-    }
+
+  	click(w / 2, h / 3)
 }
 
 /**
@@ -468,6 +468,8 @@ function exitShell() {
     if (serverUrl && sendImgRules != "notSend") {
         sendMsg(getDateTime(true) + " 打卡结果", myLog);
     }
+  	device.setBrightnessMode(1)
+  	device.setBrightness(172)
     home();
     exit();
 }
@@ -487,7 +489,7 @@ function sendMsg(title, msg) {
 
 /**
  * 保存日志
- * @param {*} msg 
+ * @param {*} msg
  */
 function setLog(msg) {
     log(msg);
@@ -563,18 +565,49 @@ function handleOrgDialog() {
  * 打开打卡页面
  */
 function goToPage() {
-    toastLog("打开钉钉中...");
-    launch("com.alibaba.android.rimet");
+    toastLog("打开闪布中...");
+    app.launchApp("闪布");
     waitStart();
     log("启动完成");
     loginIfNeed();
     sleep(waitTime * 1000);
     setLog("进入打卡页面");
-    var a = app.intent({
-        action: "VIEW",
-        data: "dingtalk://dingtalkclient/page/link?url=https://attend.dingtalk.com/attend/index.html"
-    });
-    app.startActivity(a);
+
+    stepClick('打卡')
+}
+
+function stepClick(matchStr) {
+  console.log('正在匹配 --- ', matchStr)
+  sleep(waitTime * 1000)
+  let step = text(matchStr).findOne(1000)
+  if (step) {
+    console.log('匹配成功')
+    // let stepLeft = step.bounds().left + 15
+    // let stepTop = step.bounds().top + 10
+    // console.log(stepLeft, stepTop)
+    if (matchStr !== '打卡') {
+      // click(stepLeft, stepTop)
+      while (!click(matchStr));
+    } else {
+      while (!click('打卡'));
+    }
+  } else if (matchStr == '打卡') {
+    console.log('滑动屏幕再次匹配')
+    let { height, width } = device
+    let x = width / 2
+    let y1 = (height / 3) * 2
+    let y2 = height / 3
+    let swipeResult = swipe(x, y1, x + 5, y2, 500)
+    if (swipeResult) {
+      sleep(waitTime * 1000 / 2)
+      stepClick(matchStr)
+    }
+  } else {
+    console.log('匹配失败,后退再次匹配')
+    back()
+    sleep(waitTime * 1000)
+    stepClick(matchStr)
+  }
 }
 
 /**
