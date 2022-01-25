@@ -28,6 +28,12 @@
     "validation": "required"
   },
   {
+    "label": "延迟启动脚本随机时间（秒）",
+    "name": "delayLaunchTime",
+    "placeholder": "最小时间固定为10s，此处输入最大时间（秒）",
+    "validation": "required|number|min:10"
+  },
+  {
     "label": "打卡随机时间（秒）",
     "name": "maxTime",
     "placeholder": "最小时间固定为10s，此处输入最大时间（秒）",
