@@ -1,7 +1,7 @@
 importClass(android.provider.Settings);
 importClass(android.content.Context);
 /* --------------------------------------预配置开始----------------------------------- */
-const { serverUrl, companyName, morTime, nightTime, tokenUrl, maxTime, waitTime, pwd, sendImgRules, account, accountPwd, jumpRules } = hamibot.env;
+const { serverUrl, companyName, delayLaunchTime, morTime, nightTime, tokenUrl, maxTime, waitTime, pwd, sendImgRules, account, accountPwd, jumpRules } = hamibot.env;
 var myLog = "";
 var myStr = "";
 const w = device.width;
@@ -60,11 +60,14 @@ startProgram();
  */
 function startProgram() {
     unlockIfNeed();
-
+  
   	device.setBrightnessMode(0)
   	device.setBrightness(0)
-
-    sleep(waitTime * 1000);
+  
+    var delayTime = random(0, delayLaunchTime);
+    toast(delayTime + "s后开始启动脚本");
+    sleep((delayTime + waitTime) * 1000);
+    unlockIfNeed();
     // 1.检查权限
     checkMyPermission();
     // 2.进入页面
@@ -402,7 +405,7 @@ function getContentByOcr() {
 function punchTheClock() {
     setLog("当前操作：" + myStr);
     waitBtnShow();
-
+    
   	click(w / 2, h / 3)
 }
 
@@ -489,7 +492,7 @@ function sendMsg(title, msg) {
 
 /**
  * 保存日志
- * @param {*} msg
+ * @param {*} msg 
  */
 function setLog(msg) {
     log(msg);
@@ -572,7 +575,7 @@ function goToPage() {
     loginIfNeed();
     sleep(waitTime * 1000);
     setLog("进入打卡页面");
-
+  
     stepClick('打卡')
 }
 
